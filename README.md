@@ -1,28 +1,61 @@
 # APE Agent - Agent Protocol Evaluation
 
-An A2A-compliant agent designed for evaluation testing. This agent implements the elementary math problem-solving capability as part of the Agent Protocol Evaluation (APE) toolkit.
+A comprehensive A2A-compliant agent designed for the Agent Protocol Evaluation (APE) toolkit. This multi-capability agent implements various skills including math solving, tool usage, image understanding, web browsing automation, code execution, and memory management.
 
 ## Features
 
 ### Currently Implemented
-- **Elementary Math Solver**: Handles basic arithmetic and word problems
-  - Addition, subtraction, multiplication, division
-  - Simple word problems
+
+- **Elementary Math Solver**: Handles arithmetic and word problems
+  - Basic operations (addition, subtraction, multiplication, division)
+  - Word problem interpretation
   - Decimal calculations
-  - Step-by-step problem solving using LLM
+  - LLM-powered step-by-step solving
+
+- **Tool Usage - Hash Operations**: Cryptographic hash operations
+  - SHA512 hashing
+  - MD5 hashing
+  - Sequential hash operation chains
+  - String-based hash transformations
+
+- **Image Understanding**: AI-powered image analysis
+  - Object detection and classification
+  - Animal identification (cats, dogs, etc.)
+  - General object recognition
+  - Support for JPEG, PNG, GIF, and WebP formats
+
+- **Web Browsing - Tic-tac-toe**: Browser automation for game playing
+  - Automated Tic-tac-toe gameplay
+  - Strategic move selection
+  - Web page interaction via Selenium
+  - Game state analysis and winning strategies
+
+- **Code Generation and Execution**: Python code solutions
+  - Fibonacci sequence computation
+  - Factorial calculations
+  - Prime number detection
+  - Custom algorithm implementation
+  - Safe sandboxed execution
+
+- **Memory Management**: Persistent information storage
+  - Store and retrieve information across sessions
+  - Context retention for conversations
+  - Key-value based memory system
 
 ## Prerequisites
 
 - Python 3.10 or higher
-- Google AI API key (for Gemini model)
+- Google AI API key (for Gemini 2.5 Flash model)
 - A2A Python SDK
+- Chrome/Chromium browser (for web browsing features)
+- Selenium WebDriver
 
 ## Installation
 
-1. **Clone the repository** (if not already done):
+1. **Clone the repository**:
    ```bash
-   git clone https://github.com/a2aproject/a2a-samples.git
-   cd a2a-samples
+   git clone <repository-url>
+   cd ape-agent
    ```
 
 2. **Set up Python environment**:
@@ -33,12 +66,11 @@ An A2A-compliant agent designed for evaluation testing. This agent implements th
 
 3. **Install dependencies**:
    ```bash
-   pip install -r samples/python/requirements.txt
+   pip install -r requirements.txt
    ```
 
 4. **Configure environment**:
    ```bash
-   cd samples/python/agents/ape-agent
    cp .env.example .env
    ```
    
@@ -48,6 +80,18 @@ An A2A-compliant agent designed for evaluation testing. This agent implements th
    ```
    
    Get your API key from: https://makersuite.google.com/app/apikey
+
+5. **Install Chrome WebDriver** (for web browsing features):
+   ```bash
+   # On macOS with Homebrew:
+   brew install chromedriver
+   
+   # On Ubuntu/Debian:
+   sudo apt-get install chromium-chromedriver
+   
+   # Or download manually from:
+   # https://chromedriver.chromium.org/
+   ```
 
 ## Running the Agent
 
@@ -73,7 +117,7 @@ An A2A-compliant agent designed for evaluation testing. This agent implements th
 
 ## Usage Examples
 
-### Basic Math Problem
+### Elementary Math
 ```python
 {
   "message": {
@@ -86,30 +130,70 @@ An A2A-compliant agent designed for evaluation testing. This agent implements th
 # Response: "15"
 ```
 
-### Word Problem
+### Hash Operations
 ```python
 {
   "message": {
     "role": "user",
     "parts": [
-      {"kind": "text", "text": "If I have 12 apples and give away 4, how many do I have left?"}
+      {"kind": "text", "text": "Execute sha512 on 'hello'"}
     ]
   }
 }
-# Response: "8"
+# Response: SHA512 hash of 'hello'
 ```
 
-### Complex Calculation
+### Image Analysis
 ```python
 {
   "message": {
     "role": "user",
     "parts": [
-      {"kind": "text", "text": "Calculate (10 + 5) * 2"}
+      {"kind": "text", "text": "What animal is in this image?"},
+      {"kind": "image", "data": "<base64_image_data>"}
     ]
   }
 }
-# Response: "30"
+# Response: "cat" or "dog"
+```
+
+### Code Execution
+```python
+{
+  "message": {
+    "role": "user",
+    "parts": [
+      {"kind": "text", "text": "Compute the 10th Fibonacci number"}
+    ]
+  }
+}
+# Response: "55"
+```
+
+### Web Interaction
+```python
+{
+  "message": {
+    "role": "user",
+    "parts": [
+      {"kind": "text", "text": "Play and win a game of Tic-tac-toe"}
+    ]
+  }
+}
+# Response: Game results with moves made
+```
+
+### Memory Storage
+```python
+{
+  "message": {
+    "role": "user",
+    "parts": [
+      {"kind": "text", "text": "Remember that my favorite color is blue"}
+    ]
+  }
+}
+# Response: "I'll remember that your favorite color is blue"
 ```
 
 ## Evaluation Testing
@@ -120,32 +204,49 @@ This agent is designed to work with the APE (Agent Protocol Evaluation) toolkit.
 2. In the APE evaluation interface:
    - Enter your agent URL: `http://localhost:8000`
    - No authorization token required (unless configured)
-   - Run the "Elementary Math" test suite
+   - Select and run the appropriate test suite:
+     - "Elementary Math" for arithmetic problems
+     - "Tool Usage" for hash operations
+     - "Image Understanding" for vision tasks
+     - "Web Browsing" for Tic-tac-toe
+     - "Code Execution" for programming challenges
 
 The agent will:
-- Parse math problems from natural language
-- Use the Gemini LLM to solve problems step-by-step
-- Return only the numerical answer as required by APE
-- Handle both direct calculations and word problems
+- Intelligently route requests to the appropriate tool
+- Use Gemini 2.5 Flash for LLM-powered analysis
+- Execute tasks with appropriate error handling
+- Return formatted responses per APE requirements
 
 ## Architecture
 
 ```
 ape-agent/
 ├── __main__.py         # Server setup and A2A configuration
-├── agent.py            # Core agent logic with LLM integration
+├── agent.py            # Core agent with LLM routing
 ├── agent_executor.py   # A2A protocol handler
-├── test_client.py      # Test client for validation
-├── .env.example        # Environment configuration template
-└── README.md          # This file
+├── tools.py            # Hash operation tools
+├── math_tool.py        # Math problem solver
+├── image_tool.py       # Image analysis module
+├── web_tool.py         # Web browser automation
+├── code_tool.py        # Code execution sandbox
+├── memory_tool.py      # Persistent memory storage
+├── tictactoe_logic.py  # Tic-tac-toe game logic
+├── .env.example        # Environment configuration
+└── README.md           # This file
 ```
 
 ### Components
 
-- **APEAgent**: Core agent class that interfaces with Google's Gemini model
-- **APEAgentExecutor**: Handles A2A protocol interactions and event streaming
-- **Server**: A2A-compliant HTTP server using Starlette/Uvicorn
-- **Test Client**: Comprehensive testing suite for all agent capabilities
+- **APEAgent**: Core agent with intelligent request routing
+- **APEAgentExecutor**: A2A protocol handler with streaming support
+- **Tool Modules**: Specialized handlers for each capability
+  - MathSolver: LLM-powered math problem solving
+  - ImageDetector: Vision model for image analysis
+  - WebBrowser: Selenium-based web automation
+  - CodeExecutor: Safe Python code execution
+  - MemoryTool: JSON-based persistent storage
+  - HashToolExecutor: Cryptographic operations
+- **Server**: A2A-compliant HTTP server (Starlette/Uvicorn)
 
 ## Configuration
 
@@ -163,8 +264,18 @@ Environment variables (in `.env`):
 - Verify Python version is 3.10+
 
 ### Math answers are incorrect
-- The agent uses Gemini 1.5 Flash with temperature=0 for consistency
-- Complex problems may need prompt refinement in `agent.py`
+- The agent uses Gemini 2.5 Flash with temperature=0 for consistency
+- Complex problems may need prompt refinement in `math_tool.py`
+
+### Web browsing fails
+- Ensure Chrome/Chromium and ChromeDriver are installed
+- Check that ChromeDriver version matches Chrome version
+- Verify the Tic-tac-toe URL is accessible
+
+### Image processing errors
+- Verify image format is supported (JPEG, PNG, GIF, WebP)
+- Check base64 encoding is correct
+- Ensure image data is properly formatted
 
 ### Connection errors
 - Ensure the server is running before starting the test client
@@ -174,10 +285,18 @@ Environment variables (in `.env`):
 
 To extend the agent with additional APE capabilities:
 
-1. Add new skills in `__main__.py`
-2. Implement handlers in `agent.py`
-3. Update `agent_executor.py` for any special protocol handling
-4. Add tests in `test_client.py`
+1. Define new skills in `__main__.py`
+2. Create a new tool module (e.g., `new_tool.py`)
+3. Add tool initialization in `agent.py`
+4. Update routing logic in `agent.py`
+5. Test with the A2A protocol
+
+### Adding a New Tool
+
+1. Create tool class with `execute()` method
+2. Initialize in `APEAgent.__init__()`
+3. Add to routing prompt in `agent.py`
+4. Define skill metadata in `__main__.py`
 
 ## Contributing
 
